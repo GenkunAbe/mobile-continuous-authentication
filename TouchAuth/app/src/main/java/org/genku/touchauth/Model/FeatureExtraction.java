@@ -13,15 +13,16 @@ public class FeatureExtraction {
         if (event.midData.length == 0) {
             return extractClickEvent(event);
         }
-        double startTime = Double.parseDouble(event.prevData[0][0]);
-        double endTime = Double.parseDouble(event.postData[0][0]);
-        if (Math.abs(endTime - startTime) < 0.05) {
-            event.midData = null;
-            return extractClickEvent(event);
-        }
-        else {
-            return extractSlideEvent(event);
-        }
+        return extractSlideEvent(event);
+//        double startTime = Double.parseDouble(event.prevData[0][0]);
+//        double endTime = Double.parseDouble(event.postData[0][0]);
+//        if (Math.abs(endTime - startTime) < 0.05) {
+//            event.midData = null;
+//            return extractClickEvent(event);
+//        }
+//        else {
+//            return extractSlideEvent(event);
+//        }
     }
 
     private static double[] extractClickEvent(TouchEvent event) {
@@ -52,12 +53,12 @@ public class FeatureExtraction {
         x[0] = MathUtils.hexToDec(event.prevData[1][3]);
         y[0] = MathUtils.hexToDec(event.prevData[2][3]);
         t[0] = Double.parseDouble(event.prevData[0][0]);
-        for (int i = 1; i <= numOfMid; ++i) {
-            p[i] = MathUtils.hexToDec(event.midData[i][0][3]);
-            x[i] = MathUtils.hexToDec(event.midData[i][1][3]);
-            y[i] = MathUtils.hexToDec(event.midData[i][2][3]);
-            t[i] = Double.parseDouble(event.midData[i][0][0]);
-            v[i] = MathUtils.displacement(x[i], y[i], x[i - 1], y[i - 1]) / (t[i] - t[i - 1]);
+        for (int i = 0; i < numOfMid; ++i) {
+            p[i + 1] = MathUtils.hexToDec(event.midData[i][0][3]);
+            x[i + 1] = MathUtils.hexToDec(event.midData[i][1][3]);
+            y[i + 1] = MathUtils.hexToDec(event.midData[i][2][3]);
+            t[i + 1] = Double.parseDouble(event.midData[i][0][0]);
+            v[i + 1] = MathUtils.displacement(x[i + 1], y[i + 1], x[i], y[i]) / (t[i + 1] - t[i]);
         }
 
 

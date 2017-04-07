@@ -36,7 +36,7 @@ public class DataCollectingService extends Service {
         final String dir = Environment.getExternalStorageDirectory().getAbsolutePath();
         final String rawFilename = dir + "/touch.txt";
         final String clickFeatureFilename = dir + "/click_features.txt";
-        final String featureFilename = dir + "/slide_features.txt";
+        final String slideFeatureFilename = dir + "/slide_features.txt";
 
         new Thread(new Runnable() {
             @Override
@@ -57,7 +57,12 @@ public class DataCollectingService extends Service {
                             double[] features = FeatureExtraction.extract(event);
                             String raw = sb.substring(event.start, event.end);
                             TextFile.writeFile(rawFilename, raw, true);
-                            TextFile.writeFileFromNums(featureFilename, features, true);
+                            if (features.length < 5) {
+                                TextFile.writeFileFromNums(clickFeatureFilename, features, true);
+                            }
+                            else {
+                                TextFile.writeFileFromNums(slideFeatureFilename, features, true);
+                            }
 
                             sb.delete(event.start, event.end);
                         }
