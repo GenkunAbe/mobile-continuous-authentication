@@ -49,7 +49,7 @@ public class DataCollectingService extends Service {
                     while(true) {
                         byte[] b = new byte[4096];
                         int n = is.read(b);
-                        if (n == -1) break;
+                        if (n == -1) continue;
                         sb.append(new String(b, 0, n));
                         TouchEvent event = TouchEvent.getTouchEventFromString(sb.toString());
                         if (event != null) {
@@ -68,7 +68,8 @@ public class DataCollectingService extends Service {
                         }
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
+//                    e.printStackTrace();
                 }
             }
         }).start();
