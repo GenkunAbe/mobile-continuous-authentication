@@ -4,15 +4,19 @@ package org.genku.touchauth.Service;
  * Created by genku on 4/1/2017.
  */
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
+import org.genku.touchauth.MainActivity;
 import org.genku.touchauth.Model.FeatureExtraction;
 import org.genku.touchauth.Model.PostEventMethod;
 import org.genku.touchauth.Model.TouchEvent;
+import org.genku.touchauth.R;
 import org.genku.touchauth.Util.TextFile;
 
 import java.io.BufferedReader;
@@ -21,6 +25,12 @@ import java.io.InputStreamReader;
 import java.util.concurrent.Callable;
 
 public class DataCollectingService extends Service {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        improvePriority();
+    }
 
     // Get External Storage Directory & the filename of raw data and features
     final String dir = Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -58,6 +68,18 @@ public class DataCollectingService extends Service {
         }).start();
 
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void improvePriority() {
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, MainActivity.class), 0);
+        Notification notification = new Notification.Builder(this)
+                .setContentTitle("Touch Auth")
+                .setContentText("Data Collecting Service Started.")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .build();
+        notification.contentIntent = contentIntent;
+        startForeground(1, notification);
     }
 
     public static void collect(PostEventMethod postEvent) {
@@ -113,5 +135,11 @@ public class DataCollectingService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @Override
+    public void onDestroy() {
+        stopForeground(true);
+        super.onDestroy();
     }
 }

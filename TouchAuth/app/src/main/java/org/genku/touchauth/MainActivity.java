@@ -49,6 +49,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onCollectStartButtonClick(View view) {
+
+        try {
+            stopService(new Intent(this, PredictService.class));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         Toast.makeText(this, "Collecting Start...", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent();
         intent.setClass(this, DataCollectingService.class);
@@ -83,10 +90,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onTestStartButtonClick(View view) {
+
+        try {
+            stopService(new Intent(this, DataCollectingService.class));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         Toast.makeText(this, " Start...", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent();
         intent.setClass(this, PredictService.class);
         startService(intent);
     }
 
+    public void onStopButtonClick(View view) {
+
+        try {
+            stopService(new Intent(this, DataCollectingService.class));
+            stopService(new Intent(this, PredictService.class));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 }

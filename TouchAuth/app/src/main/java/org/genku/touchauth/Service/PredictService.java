@@ -1,5 +1,7 @@
 package org.genku.touchauth.Service;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.os.Environment;
@@ -9,6 +11,7 @@ import android.support.annotation.IntDef;
 import org.genku.touchauth.MainActivity;
 import org.genku.touchauth.Model.FeatureExtraction;
 import org.genku.touchauth.Model.PostEventMethod;
+import org.genku.touchauth.R;
 import org.genku.touchauth.Util.TextFile;
 
 public class PredictService extends Service {
@@ -25,6 +28,12 @@ public class PredictService extends Service {
     }
 
     @Override
+    public void onCreate() {
+        super.onCreate();
+        improvePriority();
+    }
+
+    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         new Thread(new Runnable() {
@@ -35,6 +44,18 @@ public class PredictService extends Service {
         }).start();
 
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void improvePriority() {
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                new Intent(this, MainActivity.class), 0);
+        Notification notification = new Notification.Builder(this)
+                .setContentTitle("Touch Auth")
+                .setContentText("Predicting Service Started.")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .build();
+        notification.contentIntent = contentIntent;
+        startForeground(1, notification);
     }
 
     private void predict() {
@@ -91,5 +112,11 @@ public class PredictService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @Override
+    public void onDestroy() {
+        stopForeground(true);
+        super.onDestroy();
     }
 }
