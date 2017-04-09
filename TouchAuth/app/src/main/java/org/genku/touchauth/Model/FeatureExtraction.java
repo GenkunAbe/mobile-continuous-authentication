@@ -10,19 +10,10 @@ public class FeatureExtraction {
 
     public static double[] extract(TouchEvent event) {
         if (event == null) return null;
-        if (event.midData.length == 0) {
+        if (event.midData.length <= 1) {
             return extractClickEvent(event);
         }
         return extractSlideEvent(event);
-//        double startTime = Double.parseDouble(event.prevData[0][0]);
-//        double endTime = Double.parseDouble(event.postData[0][0]);
-//        if (Math.abs(endTime - startTime) < 0.05) {
-//            event.midData = null;
-//            return extractClickEvent(event);
-//        }
-//        else {
-//            return extractSlideEvent(event);
-//        }
     }
 
     private static double[] extractClickEvent(TouchEvent event) {
