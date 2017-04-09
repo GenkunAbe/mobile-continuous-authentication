@@ -55,13 +55,38 @@ public class TextFile {
         return result;
     }
 
-    public static void writeFileFromNums(String filename, double[] nums, boolean isAdd) {
+    public static void writeFileFromNums(
+            String filename, double[] nums,
+            boolean isAdd, boolean isSvmMode, int label) {
+
         StringBuilder sb = new StringBuilder("");
-        for (double num : nums) {
-            sb.append(num + "\t");
+        if (isSvmMode) {
+            sb.append(label > 0 ? "+" + label : label).append("\t");
+            for (int i = 0; i < nums.length; ++i) {
+                sb.append(i + 1).append(":").append(nums[i]).append("\t");
+            }
+        }
+        else {
+            for (double num : nums) {
+                sb.append(num).append("\t");
+            }
         }
         sb.append("\n");
         writeFile(filename, sb.toString(), isAdd);
+    }
+
+    public static double[][] readFileToMatrix(String filename) {
+
+        String rawString = readFile(filename);
+        String[] lines = rawString.split("\n");
+        double[][] vectors = new double[lines.length][lines[0].split("\t").length];
+        for (int i = 0; i < lines.length; ++i) {
+            String[] items = lines[i].split("\t");
+            for (int j = 0; j < items.length; ++j) {
+                vectors[i][j] = Double.parseDouble(items[j]);
+            }
+        }
+        return vectors;
     }
 
 

@@ -1,5 +1,9 @@
 package org.genku.touchauth.Service;
 
+/**
+ * Created by genku on 4/1/2017.
+ */
+
 import android.app.Service;
 import android.content.Intent;
 import android.os.Environment;
@@ -7,12 +11,14 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import org.genku.touchauth.Model.FeatureExtraction;
+import org.genku.touchauth.Model.PostEventMethod;
 import org.genku.touchauth.Model.TouchEvent;
 import org.genku.touchauth.Util.TextFile;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.concurrent.Callable;
 
 public class DataCollectingService extends Service {
 
@@ -31,14 +37,30 @@ public class DataCollectingService extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                collect();
+
+                collect(new PostEventMethod(){
+                    @Override
+                    public Void call() throws Exception {
+                        double[] features = FeatureExtraction.extract(this.event);
+                        String raw = this.sb.substring(this.event.start, this.event.end);
+                        TextFile.writeFile(rawFilename, raw, true);
+                        if (features.length < 5) {
+                            TextFile.writeFileFromNums(clickFeatureFilename, features, true, false, 1);
+                        }
+                        else {
+                            TextFile.writeFileFromNums(slideFeatureFilename, features, true, false, 1);
+                        }
+                        return null;
+                    }
+                });
+
             }
         }).start();
 
         return super.onStartCommand(intent, flags, startId);
     }
 
-    private void collect() {
+    public static void collect(PostEventMethod postEvent) {
         try {
             // Kill the previous getevent process
             try {
@@ -70,15 +92,9 @@ public class DataCollectingService extends Service {
 
                     TouchEvent event = TouchEvent.getTouchEventFromString(sb.toString());
                     if (event != null) {
-                        double[] features = FeatureExtraction.extract(event);
-                        String raw = sb.substring(event.start, event.end);
-                        TextFile.writeFile(rawFilename, raw, true);
-                        if (features.length < 5) {
-                            TextFile.writeFileFromNums(clickFeatureFilename, features, true);
-                        }
-                        else {
-                            TextFile.writeFileFromNums(slideFeatureFilename, features, true);
-                        }
+
+                        postEvent.setParam(event, sb);
+                        postEvent.call();
 
                         sb.delete(event.start, event.end);
                         i -= 10;
@@ -89,7 +105,7 @@ public class DataCollectingService extends Service {
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            collect();
+            collect(postEvent);
         }
     }
 

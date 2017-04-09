@@ -1,5 +1,9 @@
 package org.genku.touchauth.Model;
 
+/**
+ * Created by genku on 4/1/2017.
+ */
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

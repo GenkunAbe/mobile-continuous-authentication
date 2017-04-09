@@ -1,5 +1,9 @@
 package org.genku.touchauth;
 
+/**
+ * Created by genku on 4/1/2017.
+ */
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
@@ -8,34 +12,25 @@ import android.os.Build;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.view.View;
+import android.widget.Toast;
 
-import org.genku.touchauth.Model.TouchEvent;
+import org.genku.touchauth.Model.SVM.SVM;
 import org.genku.touchauth.Service.DataCollectingService;
-
-import java.io.InputStream;
+import org.genku.touchauth.Service.PredictService;
+import org.genku.touchauth.Util.TextFile;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static SVM clickModel;
+    public static SVM slideModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (isGrantExternalRW(this)) {
-            return;
-        }
-
-        final String dir = Environment.getExternalStorageDirectory().getAbsolutePath();
-        final String filename = dir + "/touch.txt";
-        TextView tv = (TextView) findViewById(R.id.tv);
-        tv.setText(filename);
-
-        Intent intent = new Intent();
-        intent.setClass(this, DataCollectingService.class);
-        startService(intent);
-
-
+        isGrantExternalRW(this);
     }
 
     public static boolean isGrantExternalRW(Activity activity) {
@@ -52,4 +47,46 @@ public class MainActivity extends AppCompatActivity {
 
         return false;
     }
+
+    public void onCollectStartButtonClick(View view) {
+        Toast.makeText(this, "Collecting Start...", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent();
+        intent.setClass(this, DataCollectingService.class);
+        startService(intent);
+    }
+
+    public void onTrainStartButtonClick(View view) {
+
+        Toast.makeText(this, "Training Start...", Toast.LENGTH_SHORT).show();
+
+        String dir  = Environment.getExternalStorageDirectory().getAbsolutePath();
+        double[][] clickFeatures = TextFile.readFileToMatrix(dir + "/click_features.txt");
+        double[][] slideFeatures = TextFile.readFileToMatrix(dir + "/slide_features.txt");
+
+        double[] clickLabel = new double[clickFeatures.length];
+        for (int i = 0; i < clickLabel.length; ++i) {
+            clickLabel[i] = 1;
+        }
+
+        double[] slideLabel = new double[slideFeatures.length];
+        for (int i = 0; i < slideLabel.length; ++i) {
+            slideLabel[i] = 1;
+        }
+
+
+        clickModel = new SVM();
+        clickModel.train(clickFeatures, clickLabel);
+
+        slideModel = new SVM();
+        slideModel.train(slideFeatures, slideLabel);
+        Toast.makeText(this, "Training End!", Toast.LENGTH_SHORT).show();
+    }
+
+    public void onTestStartButtonClick(View view) {
+        Toast.makeText(this, " Start...", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent();
+        intent.setClass(this, PredictService.class);
+        startService(intent);
+    }
+
 }

@@ -23,6 +23,10 @@
         <service
             android:name=".Service.DataCollectingService"
             android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".Service.PredictService"
+            android:enabled="true"
             android:exported="true"></service>
     </application>
 
