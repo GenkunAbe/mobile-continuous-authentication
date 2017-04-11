@@ -98,15 +98,14 @@ public class PredictService extends Service {
     }
 
     private boolean getPredictResult(double[][] vectors, boolean isClick) {
-        double positiveSum = 0, negativeSum = 0;
+        double positiveSum = 0, negativeSum;
         for (double[] vector : vectors) {
-            double[] ans = isClick
+            double ans = isClick
                     ? MainActivity.clickModel.predict(vector)
                     : MainActivity.slideModel.predict(vector);
-            positiveSum += ans[0];
-            negativeSum += ans[1];
+            positiveSum += ans;
         }
-        return positiveSum > negativeSum;
+        return positiveSum > 2;
     }
 
     @Override

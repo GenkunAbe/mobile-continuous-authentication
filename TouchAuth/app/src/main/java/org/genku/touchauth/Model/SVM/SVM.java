@@ -36,6 +36,7 @@ public class SVM {
         svm_node[][] data = new svm_node[rows][cols];
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < cols; ++j) {
+                data[i][j] = new svm_node();
                 data[i][j].index = j + 1;
                 data[i][j].value = vectors[i][j];
             }
@@ -48,12 +49,13 @@ public class SVM {
         model = svm.svm_train(problem, param);
     }
 
-    public double[] predict(double[] vector) {
+    public double predict(double[] vector) {
 
         int cols = vector.length;
 
         svm_node[] data = new svm_node[cols];
         for (int i = 0; i < cols; ++i) {
+            data[i] = new svm_node();
             data[i].index = i + 1;
             data[i].value = vector[i];
         }
@@ -61,6 +63,6 @@ public class SVM {
         double[] probs = new double[2];
         double label = svm.svm_predict_probability(model, data, probs);
 
-        return probs;
+        return label;
     }
 }

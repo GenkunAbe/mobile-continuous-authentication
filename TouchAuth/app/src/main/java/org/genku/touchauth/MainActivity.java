@@ -105,6 +105,18 @@ public class MainActivity extends AppCompatActivity {
 
     public void onStopButtonClick(View view) {
 
+        // Kill the previous getevent process
+        try {
+            String[] cmd = {
+                    "/system/bin/sh",
+                    "-c",
+                    "ps | grep getevent | awk \'{print $2}\' | xargs su am kill"
+            };
+            Process p = Runtime.getRuntime().exec(cmd);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         try {
             stopService(new Intent(this, DataCollectingService.class));
             stopService(new Intent(this, PredictService.class));
