@@ -12,6 +12,7 @@ import org.genku.touchauth.MainActivity;
 import org.genku.touchauth.Model.FeatureExtraction;
 import org.genku.touchauth.Model.PostEventMethod;
 import org.genku.touchauth.R;
+import org.genku.touchauth.Util.DataUtils;
 import org.genku.touchauth.Util.TextFile;
 
 public class PredictService extends Service {
@@ -75,7 +76,7 @@ public class PredictService extends Service {
                     clickFeatures[clickNum] = feature;
                     TextFile.writeFileFromNums(clickFeatureFilename, clickFeatures[clickNum++], true, false, 1);
                     if (clickNum >= 9) {
-                        boolean ans = getPredictResult(clickFeatures, true);
+                        boolean ans = getPredictResult(DataUtils.cleanData(clickFeatures), true);
                         TextFile.writeFile(clickResultFilename, ans + "\n", true);
                         clickFeatures = new double[10][2];
                         clickNum = 0;
@@ -85,7 +86,7 @@ public class PredictService extends Service {
                     slideFeatures[slideNum] = feature;
                     TextFile.writeFileFromNums(slideFeatureFilename, slideFeatures[slideNum++], true, false, 1);
                     if (slideNum >= 9) {
-                        boolean ans = getPredictResult(slideFeatures, false);
+                        boolean ans = getPredictResult(DataUtils.cleanData(slideFeatures), false);
                         TextFile.writeFile(slideResultFilename, ans + "\n", true);
                         slideFeatures = new double[10][16];
                         slideNum = 0;
