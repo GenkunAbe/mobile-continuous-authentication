@@ -20,14 +20,34 @@ public class SVM {
 
     public SVM() {
         param = new svm_parameter();
+
         param.svm_type = svm_parameter.ONE_CLASS;
-        param.kernel_type = svm_parameter.LINEAR;
+        param.kernel_type = svm_parameter.RBF;
+        param.degree = 3;
+        param.gamma = 0;	// 1/num_features
+        param.coef0 = 0;
+        param.nu = 0.5;
         param.cache_size = 100;
-        param.eps = 0.00001;
         param.C = 1;
+        param.eps = 1e-3;
+        param.p = 0.1;
+        param.shrinking = 1;
+        param.probability = 0;
+        param.nr_weight = 0;
+        param.weight_label = new int[0];
+        param.weight = new double[0];
+
+
+        // param.gamma = 0.5;
+        // param.nr_weight = 2;
+        // param.cache_size = 1000;
+        // param.eps = 0.00001;
+        // param.C = 1;
     }
 
     public void train(double[][] vectors, double[] labels) {
+
+        param.gamma = 1.0 / vectors[0].length;
 
         int rows = vectors.length;
         int cols = vectors[0].length;
@@ -61,8 +81,12 @@ public class SVM {
         }
 
         double[] probs = new double[2];
-        double label = svm.svm_predict_probability(model, data, probs);
+        double label = svm.svm_predict(model, data);
 
         return label;
+    }
+
+    public svm_model getModel() {
+        return model;
     }
 }
