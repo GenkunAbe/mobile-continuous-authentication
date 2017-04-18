@@ -18,6 +18,7 @@ import android.widget.Toast;
 import org.genku.touchauth.Model.SVM.SVM;
 import org.genku.touchauth.Service.DataCollectingService;
 import org.genku.touchauth.Service.PredictService;
+import org.genku.touchauth.Util.DataUtils;
 import org.genku.touchauth.Util.TextFile;
 
 public class MainActivity extends AppCompatActivity {
@@ -79,6 +80,12 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < slideLabel.length; ++i) {
             slideLabel[i] = 1;
         }
+
+        clickFeatures = DataUtils.cleanData(clickFeatures);
+        clickFeatures = DataUtils.scaleData(clickFeatures, dir + "/click_coefs.txt", false);
+
+        slideFeatures = DataUtils.cleanData(slideFeatures);
+        slideFeatures = DataUtils.scaleData(slideFeatures, dir + "/slide_coefs.txt", false);
 
 
         clickModel = new SVM();

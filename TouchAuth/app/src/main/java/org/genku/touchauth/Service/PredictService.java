@@ -11,6 +11,7 @@ import android.support.annotation.IntDef;
 import org.genku.touchauth.MainActivity;
 import org.genku.touchauth.Model.FeatureExtraction;
 import org.genku.touchauth.Model.PostEventMethod;
+import org.genku.touchauth.Model.SVM.SVM;
 import org.genku.touchauth.R;
 import org.genku.touchauth.Util.DataUtils;
 import org.genku.touchauth.Util.TextFile;
@@ -23,6 +24,9 @@ public class PredictService extends Service {
     final String slideFeatureFilename = dir + "/slide_test_features.txt";
     final String clickResultFilename = dir + "/click_result_features.txt";
     final String slideResultFilename = dir + "/slide_result_features.txt";
+
+    final String clickCoefsFilename = dir + "/click_coefs.txt";
+    final String slideCoefsFilename = dir + "/slide_coefs.txt";
 
 
     public PredictService() {
@@ -100,10 +104,12 @@ public class PredictService extends Service {
 
     private boolean getPredictResult(double[][] vectors, boolean isClick) {
         double positiveSum = 0, negativeSum;
+        String filename = isClick ? clickCoefsFilename : slideCoefsFilename;
+        SVM model = isClick ? MainActivity.clickModel : MainActivity.slideModel;
+
+        vectors = DataUtils.scaleData(vectors, filename, true);
         for (double[] vector : vectors) {
-            double ans = isClick
-                    ? MainActivity.clickModel.predict(vector)
-                    : MainActivity.slideModel.predict(vector);
+            double ans = model.predict(vector);
             positiveSum += ans;
         }
         return positiveSum > 2;
