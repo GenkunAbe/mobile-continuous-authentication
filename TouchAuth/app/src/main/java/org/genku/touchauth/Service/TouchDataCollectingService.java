@@ -31,10 +31,10 @@ public class TouchDataCollectingService extends Service {
     }
 
     // Get External Storage Directory & the filename of raw data and features
-    final String dir = Environment.getExternalStorageDirectory().getAbsolutePath();
-    final String rawFilename = dir + "/touch.txt";
-    final String clickFeatureFilename = dir + "/click_features.txt";
-    final String slideFeatureFilename = dir + "/slide_features.txt";
+    public final String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Auth/Touch/";
+    public final String rawFilename = dir + "/touch.txt";
+    public final String clickFeatureFilename = dir + "/click_features.txt";
+    public final String slideFeatureFilename = dir + "/slide_features.txt";
 
     public TouchDataCollectingService() {
     }

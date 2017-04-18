@@ -27,6 +27,10 @@
         <service
             android:name=".Service.TouchPredictService"
             android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".Service.SensorDataCollectingService"
+            android:enabled="true"
             android:exported="true"></service>
     </application>
 

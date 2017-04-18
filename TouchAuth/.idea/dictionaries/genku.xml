@@ -3,6 +3,9 @@
     <words>
       <w>coefs</w>
       <w>getevent</w>
+      <w>kurtosis</w>
+      <w>nums</w>
+      <w>prctile</w>
       <w>probs</w>
       <w>xargs</w>
     </words>

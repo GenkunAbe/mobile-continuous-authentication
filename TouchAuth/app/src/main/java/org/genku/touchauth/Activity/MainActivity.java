@@ -32,6 +32,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        String dir = Environment.getExternalStorageDirectory().getAbsolutePath();
+        TextFile.makeRootDirectory(dir + "/Auth/");
+        TextFile.makeRootDirectory(dir + "/Auth/Touch/");
+        TextFile.makeRootDirectory(dir + "/Auth/Sensor/");
+
+
         isGrantExternalRW(this);
     }
 
