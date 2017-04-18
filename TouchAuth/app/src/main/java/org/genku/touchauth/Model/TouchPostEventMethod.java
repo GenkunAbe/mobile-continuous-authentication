@@ -6,7 +6,7 @@ import java.util.concurrent.Callable;
  * Created by genku on 4/9/2017.
  */
 
-public class PostEventMethod implements Callable<Void> {
+public class TouchPostEventMethod implements Callable<Void> {
 
     protected TouchEvent event;
     protected StringBuilder sb;

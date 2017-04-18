@@ -12,9 +12,8 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import org.genku.touchauth.MainActivity;
-import org.genku.touchauth.Model.FeatureExtraction;
-import org.genku.touchauth.Model.PostEventMethod;
+import org.genku.touchauth.Activity.MainActivity;
+import org.genku.touchauth.Model.TouchFeatureExtraction;
 import org.genku.touchauth.Model.TouchEvent;
 import org.genku.touchauth.R;
 import org.genku.touchauth.Util.TextFile;
@@ -22,9 +21,8 @@ import org.genku.touchauth.Util.TextFile;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.concurrent.Callable;
 
-public class DataCollectingService extends Service {
+public class TouchDataCollectingService extends Service {
 
     @Override
     public void onCreate() {
@@ -38,7 +36,7 @@ public class DataCollectingService extends Service {
     final String clickFeatureFilename = dir + "/click_features.txt";
     final String slideFeatureFilename = dir + "/slide_features.txt";
 
-    public DataCollectingService() {
+    public TouchDataCollectingService() {
     }
 
     @Override
@@ -51,7 +49,7 @@ public class DataCollectingService extends Service {
                 collect(new PostEventMethod(){
                     @Override
                     public Void call() throws Exception {
-                        double[] features = FeatureExtraction.extract(this.event);
+                        double[] features = TouchFeatureExtraction.extract(this.event);
                         String raw = this.sb.substring(this.event.start, this.event.end);
                         TextFile.writeFile(rawFilename, raw, true);
                         if (features.length < 5) {
@@ -141,5 +139,20 @@ public class DataCollectingService extends Service {
     public void onDestroy() {
         stopForeground(true);
         super.onDestroy();
+    }
+
+    static class PostEventMethod {
+
+        TouchEvent event;
+        StringBuilder sb;
+
+        void setParam(TouchEvent event, StringBuilder sb) {
+            this.event = event;
+            this.sb = sb;
+        }
+
+        public Void call() throws Exception {
+            return null;
+        }
     }
 }

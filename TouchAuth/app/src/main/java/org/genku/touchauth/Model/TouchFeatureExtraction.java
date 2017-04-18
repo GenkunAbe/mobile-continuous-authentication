@@ -6,7 +6,7 @@ import org.genku.touchauth.Util.MathUtils;
  * Created by genku on 4/1/2017.
  */
 
-public class FeatureExtraction {
+public class TouchFeatureExtraction {
 
     public static double[] extract(TouchEvent event) {
         if (event == null) return null;

@@ -1,4 +1,4 @@
-package org.genku.touchauth;
+package org.genku.touchauth.Activity;
 
 /**
  * Created by genku on 4/1/2017.
@@ -15,9 +15,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import org.genku.touchauth.Model.SVM.SVM;
-import org.genku.touchauth.Service.DataCollectingService;
-import org.genku.touchauth.Service.PredictService;
+import org.genku.touchauth.Model.SVM;
+import org.genku.touchauth.R;
+import org.genku.touchauth.Service.TouchDataCollectingService;
+import org.genku.touchauth.Service.TouchPredictService;
 import org.genku.touchauth.Util.DataUtils;
 import org.genku.touchauth.Util.TextFile;
 
@@ -52,14 +53,14 @@ public class MainActivity extends AppCompatActivity {
     public void onCollectStartButtonClick(View view) {
 
         try {
-            stopService(new Intent(this, PredictService.class));
+            stopService(new Intent(this, TouchPredictService.class));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         Toast.makeText(this, "Collecting Start...", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent();
-        intent.setClass(this, DataCollectingService.class);
+        intent.setClass(this, TouchDataCollectingService.class);
         startService(intent);
     }
 
@@ -99,14 +100,14 @@ public class MainActivity extends AppCompatActivity {
     public void onTestStartButtonClick(View view) {
 
         try {
-            stopService(new Intent(this, DataCollectingService.class));
+            stopService(new Intent(this, TouchDataCollectingService.class));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         Toast.makeText(this, " Start...", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent();
-        intent.setClass(this, PredictService.class);
+        intent.setClass(this, TouchPredictService.class);
         startService(intent);
     }
 
@@ -125,8 +126,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         try {
-            stopService(new Intent(this, DataCollectingService.class));
-            stopService(new Intent(this, PredictService.class));
+            stopService(new Intent(this, TouchDataCollectingService.class));
+            stopService(new Intent(this, TouchPredictService.class));
         } catch (Exception e) {
             e.printStackTrace();
         }

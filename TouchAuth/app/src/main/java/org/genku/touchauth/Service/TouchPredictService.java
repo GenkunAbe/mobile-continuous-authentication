@@ -6,17 +6,15 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.IBinder;
-import android.support.annotation.IntDef;
-
-import org.genku.touchauth.MainActivity;
-import org.genku.touchauth.Model.FeatureExtraction;
-import org.genku.touchauth.Model.PostEventMethod;
-import org.genku.touchauth.Model.SVM.SVM;
+import org.genku.touchauth.Service.TouchDataCollectingService.PostEventMethod;
+import org.genku.touchauth.Activity.MainActivity;
+import org.genku.touchauth.Model.TouchFeatureExtraction;
+import org.genku.touchauth.Model.SVM;
 import org.genku.touchauth.R;
 import org.genku.touchauth.Util.DataUtils;
 import org.genku.touchauth.Util.TextFile;
 
-public class PredictService extends Service {
+public class TouchPredictService extends Service {
 
     // Get External Storage Directory & the filename of raw data and features
     final String dir = Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -29,7 +27,7 @@ public class PredictService extends Service {
     final String slideCoefsFilename = dir + "/slide_coefs.txt";
 
 
-    public PredictService() {
+    public TouchPredictService() {
     }
 
     @Override
@@ -65,7 +63,7 @@ public class PredictService extends Service {
 
     private void predict() {
 
-        DataCollectingService.collect(new PostEventMethod(){
+        TouchDataCollectingService.collect(new PostEventMethod(){
 
             private int slideNum = 0;
             private int clickNum = 0;
@@ -75,7 +73,7 @@ public class PredictService extends Service {
             @Override
             public Void call() throws Exception {
 
-                double[] feature = FeatureExtraction.extract(event);
+                double[] feature = TouchFeatureExtraction.extract(event);
                 if (feature.length < 5) {
                     clickFeatures[clickNum] = feature;
                     TextFile.writeFileFromNums(clickFeatureFilename, clickFeatures[clickNum++], true, false, 1);

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="horizontal"
-    tools:context="org.genku.touchauth.MainActivity">
+    tools:context="org.genku.touchauth.Activity.MainActivity">
 
     <Button
         android:id="@+id/collect_start_button"

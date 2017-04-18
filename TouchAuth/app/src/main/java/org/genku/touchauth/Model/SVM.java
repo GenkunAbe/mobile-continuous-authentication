@@ -1,4 +1,4 @@
-package org.genku.touchauth.Model.SVM;
+package org.genku.touchauth.Model;
 
 import libsvm.svm;
 import libsvm.svm_model;
