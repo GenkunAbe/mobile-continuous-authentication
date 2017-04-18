@@ -1,5 +1,7 @@
 package org.genku.touchauth.Util;
 
+import java.util.Arrays;
+
 /**
  * Created by genku on 4/17/2017.
  */
@@ -29,4 +31,53 @@ public class DataUtils {
         }
         return ans;
     }
+
+    public static double[][] scaleData(double[][] vectors, String coefsFilename, boolean isRestore) {
+        if (vectors == null || vectors.length == 0) {
+            return vectors;
+        }
+
+        final double lower = -1;
+        final double upper = 1;
+
+        int n = vectors.length;
+        int m = vectors[0].length;
+        double[][] values;
+
+        if (isRestore) {
+            values = TextFile.readFileToMatrix(coefsFilename);
+            if (values[0].length != m) {
+                return null;
+            }
+        }
+        else {
+            values = new double[n][m];
+            Arrays.fill(values[0], -Double.MAX_VALUE);
+            Arrays.fill(values[1], Double.MAX_VALUE);
+            for (double[] vector : vectors) {
+                for (int i = 0; i < vector.length; ++i) {
+                    if (values[0][i] < vector[i]) {
+                        values[0][i] = vector[i];
+                    }
+                    if (values[1][i] > vector[i]) {
+                        values[1][i] = vector[i];
+                    }
+                }
+            }
+            TextFile.writeFileFromNums(coefsFilename, values[0], false, false, 0);
+            TextFile.writeFileFromNums(coefsFilename, values[1], true, false, 0);
+        }
+
+        double[][] ans = new double[n][m];
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < m; ++j) {
+                double max = values[0][j];
+                double min = values[1][j];
+                ans[i][j] = lower + (vectors[i][j] - min) / (max - min) * (upper - lower);
+            }
+        }
+
+        return ans;
+    }
+
 }
