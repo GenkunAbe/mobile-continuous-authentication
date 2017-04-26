@@ -1,6 +1,9 @@
 package org.genku.touchauth.Util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Created by genku on 4/17/2017.
@@ -8,13 +11,13 @@ import java.util.Arrays;
 
 public class DataUtils {
 
-    public static double[][] cleanData(double[][] vectors) {
+    public static double[][] cleanData(double[][] vectors, boolean includeZero) {
         int[] flags = new int[vectors.length];
         int cnt = 0, i = 0;
         for (double[] vector : vectors) {
             int flag = 1;
             for (double num : vector) {
-                if (num == 0 || num != num) {
+                if ((includeZero && num == 0) || Double.isNaN(num) || Double.isInfinite(num)) {
                     flag = 0;
                     break;
                 }
@@ -77,6 +80,24 @@ public class DataUtils {
             }
         }
 
+        return ans;
+    }
+
+    public static double[][] listToArray(List<List<Double>> list) {
+        if (list == null || list.size() == 0 || list.get(0) == null) {
+            return null;
+        }
+        int n = list.size();
+        int m = list.get(0).size();
+        double ans[][] = new double[n][m];
+        int i = 0, j = 0;
+        for (List<Double> line : list) {
+            j = 0;
+            for (Double item : line) {
+                ans[i][j++] = item;
+            }
+            ++i;
+        }
         return ans;
     }
 

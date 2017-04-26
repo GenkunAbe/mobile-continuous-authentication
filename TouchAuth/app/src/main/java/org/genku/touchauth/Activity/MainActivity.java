@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import org.genku.touchauth.Model.SVM;
 import org.genku.touchauth.R;
+import org.genku.touchauth.Service.SensorDataCollectingService;
 import org.genku.touchauth.Service.TouchDataCollectingService;
 import org.genku.touchauth.Service.TouchPredictService;
 import org.genku.touchauth.Util.DataUtils;
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             stopService(new Intent(this, TouchPredictService.class));
+            stopService(new Intent(this, SensorDataCollectingService.class));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,6 +70,10 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent();
         intent.setClass(this, TouchDataCollectingService.class);
         startService(intent);
+
+        Intent intent1 = new Intent();
+        intent1.setClass(this, SensorDataCollectingService.class);
+        startService(intent1);
     }
 
     public void onTrainStartButtonClick(View view) {
@@ -88,10 +94,10 @@ public class MainActivity extends AppCompatActivity {
             slideLabel[i] = 1;
         }
 
-        clickFeatures = DataUtils.cleanData(clickFeatures);
+        clickFeatures = DataUtils.cleanData(clickFeatures, true);
         clickFeatures = DataUtils.scaleData(clickFeatures, dir + "/click_coefs.txt", false);
 
-        slideFeatures = DataUtils.cleanData(slideFeatures);
+        slideFeatures = DataUtils.cleanData(slideFeatures, true);
         slideFeatures = DataUtils.scaleData(slideFeatures, dir + "/slide_coefs.txt", false);
 
 

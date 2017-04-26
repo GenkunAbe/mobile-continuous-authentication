@@ -78,7 +78,7 @@ public class TouchPredictService extends Service {
                     clickFeatures[clickNum] = feature;
                     TextFile.writeFileFromNums(clickFeatureFilename, clickFeatures[clickNum++], true, false, 1);
                     if (clickNum >= 9) {
-                        boolean ans = getPredictResult(DataUtils.cleanData(clickFeatures), true);
+                        boolean ans = getPredictResult(DataUtils.cleanData(clickFeatures, true), true);
                         TextFile.writeFile(clickResultFilename, ans + "\n", true);
                         clickFeatures = new double[10][2];
                         clickNum = 0;
@@ -88,7 +88,7 @@ public class TouchPredictService extends Service {
                     slideFeatures[slideNum] = feature;
                     TextFile.writeFileFromNums(slideFeatureFilename, slideFeatures[slideNum++], true, false, 1);
                     if (slideNum >= 9) {
-                        boolean ans = getPredictResult(DataUtils.cleanData(slideFeatures), false);
+                        boolean ans = getPredictResult(DataUtils.cleanData(slideFeatures, true), false);
                         TextFile.writeFile(slideResultFilename, ans + "\n", true);
                         slideFeatures = new double[10][16];
                         slideNum = 0;

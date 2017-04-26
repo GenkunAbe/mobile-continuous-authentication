@@ -5,13 +5,17 @@ import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.IntDef;
 
+import org.genku.touchauth.Model.SensorFeatureExtraction;
+import org.genku.touchauth.Util.DataUtils;
 import org.genku.touchauth.Util.TextFile;
 import org.w3c.dom.DOMConfiguration;
 
+import java.io.SyncFailedException;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.List;
@@ -29,12 +33,9 @@ public class SensorDataCollectingService extends Service implements SensorEventL
     public final String oriDir = dir + "Ori/";
     public final String magDir = dir + "Mag/";
     public final String gyrDir = dir + "Gyr/";
-    public String accFilenameNow;
-    public String oriFilenameNow;
-    public String magFilenameNow;
-    public String gyrFilenameNow;
+    public final String featureVectorsFilename = dir + "FeatureVectors.txt";
 
-
+    private SensorManager sensorManager;
     private double[] gravity = {0, 0, 9.8};
 
     private List<List<Double>> accRawData = new ArrayList<>();
@@ -48,6 +49,7 @@ public class SensorDataCollectingService extends Service implements SensorEventL
     private List<List<Double>> gyrTempData = new ArrayList<>();
 
     private int groupCount = 0;
+    private static int MAX_GROUP_COUNT = 1;
 
 
 
@@ -59,27 +61,75 @@ public class SensorDataCollectingService extends Service implements SensorEventL
         TextFile.makeRootDirectory(magDir);
         TextFile.makeRootDirectory(gyrDir);
 
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+
+        sensorManager.registerListener(this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_GAME);
+        sensorManager.registerListener(this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_FASTEST);
+        sensorManager.registerListener(this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_GAME);
+
         new Thread(new Runnable() {
             @Override
             public void run() {
                 Long startTime = System.currentTimeMillis();
+                groupCount = 0;
                 try {
                     while (true) {
                         Long currentTime = System.currentTimeMillis();
                         if (currentTime - startTime > INTERVAL * 1000) {
                             startTime = currentTime;
+
                             List<List<Double>> accData = accRawData;
                             accRawData = new ArrayList<>();
+                            List<List<Double>> oriData = oriRawData;
+                            oriRawData = new ArrayList<>();
+                            List<List<Double>> magData = magRawData;
+                            magRawData = new ArrayList<>();
+                            List<List<Double>> gyrData = gyrRawData;
+                            gyrRawData = new ArrayList<>();
+
+                            accTempData.addAll(accData);
+                            oriTempData.addAll(oriData);
+                            magTempData.addAll(magData);
+                            gyrTempData.addAll(gyrData);
                             ++groupCount;
-                            if (groupCount < 4) {
-                                accTempData.addAll(accData);
-                            }
-                            else {
+
+                            if (groupCount == MAX_GROUP_COUNT) {
+
                                 groupCount = 0;
+
+                                double[][] acc = DataUtils.listToArray(accTempData);
+                                double[][] ori = DataUtils.listToArray(oriTempData);
+                                double[][] mag = DataUtils.listToArray(magTempData);
+                                double[][] gyr = DataUtils.listToArray(gyrTempData);
+
+                                saveRawFile(currentTime, acc, ori, mag, gyr);
+
+                                final double[][] featureVectors = SensorFeatureExtraction.extract(
+                                        INTERVAL * MAX_GROUP_COUNT,
+                                        2, acc, ori, mag, gyr);
+
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        for (double[] line : featureVectors) {
+                                            TextFile.writeFileFromNums(featureVectorsFilename, line, true, false, 1);
+                                        }
+                                    }
+                                }).start();
+
+
 
 
 
                                 accTempData = new ArrayList<>();
+                                oriTempData = new ArrayList<>();
+                                magTempData = new ArrayList<>();
+                                gyrTempData = new ArrayList<>();
                             }
                         }
                     }
@@ -144,5 +194,33 @@ public class SensorDataCollectingService extends Service implements SensorEventL
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    private void saveRawFile(final Long currentTime,
+                             final double[][] acc,
+                             final double[][] ori,
+                             final double[][] mag,
+                             final double[][] gyr) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String accFilename = accDir + currentTime + ".txt";
+                String oriFilename = oriDir + currentTime + ".txt";
+                String magFilename = magDir + currentTime + ".txt";
+                String gyrFilename = gyrDir + currentTime + ".txt";
+                for (double[] line : acc) {
+                    TextFile.writeFileFromNums(accFilename, line, true, false, 1);
+                }
+                for (double[] line : ori) {
+                    TextFile.writeFileFromNums(oriFilename, line, true, false, 1);
+                }
+                for (double[] line : mag) {
+                    TextFile.writeFileFromNums(magFilename, line, true, false, 1);
+                }
+                for (double[] line : gyr) {
+                    TextFile.writeFileFromNums(gyrFilename, line, true, false, 1);
+                }
+            }
+        }).start();
     }
 }
