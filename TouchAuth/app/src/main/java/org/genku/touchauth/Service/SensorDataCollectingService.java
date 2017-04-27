@@ -66,11 +66,11 @@ public class SensorDataCollectingService extends Service implements SensorEventL
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_FASTEST);
         sensorManager.registerListener(this,
-                sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_GAME);
+                sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_FASTEST);
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD), SensorManager.SENSOR_DELAY_FASTEST);
         sensorManager.registerListener(this,
-                sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_GAME);
+                sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE), SensorManager.SENSOR_DELAY_FASTEST);
 
         new Thread(new Runnable() {
             @Override
@@ -222,5 +222,24 @@ public class SensorDataCollectingService extends Service implements SensorEventL
                 }
             }
         }).start();
+    }
+
+    private double mean(double[] vector) {
+        double mean = 0;
+        for (double value : vector) {
+            mean += value;
+        }
+        mean /= vector.length;
+        return mean;
+    }
+
+    private double var(double[] vector) {
+        double var = 0;
+        double mean = mean(vector);
+        for (double value : vector) {
+            var += Math.pow(value - mean, 2);
+        }
+        var /= vector.length;
+        return var;
     }
 }

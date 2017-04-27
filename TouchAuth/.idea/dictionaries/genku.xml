@@ -2,8 +2,11 @@
   <dictionary name="genku">
     <words>
       <w>coefs</w>
+      <w>combsingnalmagi</w>
       <w>getevent</w>
       <w>kurtosis</w>
+      <w>numoflocalcrests</w>
+      <w>numoflocalpeaks</w>
       <w>nums</w>
       <w>prctile</w>
       <w>probs</w>
