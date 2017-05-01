@@ -55,6 +55,19 @@ public class TextFile {
         return result;
     }
 
+    public static void writeFileFromNums(String filename, double[][] nums, boolean isAdd) {
+        int size = nums.length;
+        if (size < 1) return;
+        if (isAdd) {
+            writeFileFromNums(filename, nums[0], true, false, -1);
+        } else {
+            writeFileFromNums(filename, nums[0], false, false, -1);
+        }
+        for (int i = 1; i < size; ++i) {
+            writeFileFromNums(filename, nums[i], true, false, -1);
+        }
+    }
+
     public static void writeFileFromNums(
             String filename, double[] nums,
             boolean isAdd, boolean isSvmMode, int label) {

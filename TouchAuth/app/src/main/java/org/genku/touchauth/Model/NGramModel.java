@@ -1,5 +1,7 @@
 package org.genku.touchauth.Model;
 
+import org.genku.touchauth.Util.TextFile;
+
 /**
  * Created by genku on 4/27/2017.
  */
@@ -11,7 +13,6 @@ public class NGramModel {
     private int N;
 
     private Assessment assessment;
-    private int[] dictionary;
     private double[][] model;
 
     public NGramModel(int numOfClusters, int N) {
@@ -19,11 +20,18 @@ public class NGramModel {
         this.N = N;
     }
 
+    public NGramModel(double[][] model, double[][] centroids, int N) {
+        this.model = model;
+        this.assessment.centroids = centroids;
+        this.numOfClusters = centroids.length;
+        this.N = N;
+    }
+
     public void train(double[][] featureVectors) {
         this.numOfFeatures = featureVectors[0].length;
         assessment = KMeans.kMeansPlusPlus(featureVectors, numOfClusters);
-        dictionary = buildDictionary(featureVectors, assessment.centroids);
-        model = buildModel();
+        int[] dictionary = buildDictionary(featureVectors, assessment.centroids);
+        model = buildModel(dictionary);
     }
 
     public double predict(double[][] featureVectors) {
@@ -41,6 +49,14 @@ public class NGramModel {
         return ans;
     }
 
+    public double[][] getModel() {
+        return model;
+    }
+
+    public void saveModel(String filename) {
+        TextFile.writeFileFromNums(filename, model, false);
+    }
+
     private double getProbability(int[] seq) {
         double ans = 1;
         for (int i = 0; i < seq.length - 1; ++i) {
@@ -49,10 +65,10 @@ public class NGramModel {
         return ans;
     }
 
-    private double[][] buildModel() {
+    private double[][] buildModel(int[] dictionary) {
         double[][] ans = new double[numOfFeatures][numOfFeatures];
         for (int i = 0; i < numOfFeatures; ++i) {
-            double denominator = (double) count(i);
+            double denominator = (double) frequencyInDict(i, dictionary);
 
             if (denominator < 1e-6) {
                 for (int j = 0; j < numOfFeatures; ++j) {
@@ -62,7 +78,7 @@ public class NGramModel {
             }
 
             for (int j = 0; j < numOfFeatures; ++j) {
-                ans[i][j] = count(i, j) / denominator;
+                ans[i][j] = frequencyInDict(i, j, dictionary) / denominator;
                 if (ans[i][j] < 1e-6) {
                     ans[i][j] = 1e-3;
                 }
@@ -71,20 +87,20 @@ public class NGramModel {
         return ans;
     }
 
-    private int count(int a) {
+    private static int frequencyInDict(int target, int[] dictionary) {
         int ans = 0;
         for (int x : dictionary) {
-            if (a == x) {
+            if (x == target) {
                 ++ans;
             }
         }
         return ans;
     }
 
-    private int count(int a, int b) {
+    private static int frequencyInDict(int seq1, int seq2, int[] dictionary) {
         int ans = 0;
         for (int i = 0; i < dictionary.length - 1; ++i) {
-            if (dictionary[i] == a && dictionary[i + 1] == b) {
+            if (dictionary[i] == seq1 && dictionary[i + 1] == seq2) {
                 ++ans;
             }
         }
