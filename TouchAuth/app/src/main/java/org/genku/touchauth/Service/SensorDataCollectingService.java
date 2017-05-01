@@ -122,10 +122,6 @@ public class SensorDataCollectingService extends Service implements SensorEventL
                                     }
                                 }).start();
 
-
-
-
-
                                 accTempData = new ArrayList<>();
                                 oriTempData = new ArrayList<>();
                                 magTempData = new ArrayList<>();
