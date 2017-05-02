@@ -1,6 +1,6 @@
 package org.genku.touchauth.Model;
 
-import org.genku.touchauth.Util.TextFile;
+import org.genku.touchauth.Util.FileUtils;
 
 /**
  * Created by genku on 4/27/2017.
@@ -54,7 +54,11 @@ public class NGramModel {
     }
 
     public void saveModel(String filename) {
-        TextFile.writeFileFromNums(filename, model, false);
+        FileUtils.writeFileFromNums(filename, model, false);
+    }
+
+    public void saveCentroids(String filename) {
+        FileUtils.writeFileFromNums(filename, assessment.centroids, false);
     }
 
     private double getProbability(int[] seq) {

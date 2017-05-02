@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
-public class TextFile {
+public class FileUtils {
 
     public static void writeFile(String fileName, String content, boolean isAdd) {
         try {

@@ -16,7 +16,7 @@ import org.genku.touchauth.Activity.MainActivity;
 import org.genku.touchauth.Model.TouchFeatureExtraction;
 import org.genku.touchauth.Model.TouchEvent;
 import org.genku.touchauth.R;
-import org.genku.touchauth.Util.TextFile;
+import org.genku.touchauth.Util.FileUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -51,12 +51,12 @@ public class TouchDataCollectingService extends Service {
                     public Void call() throws Exception {
                         double[] features = TouchFeatureExtraction.extract(this.event);
                         String raw = this.sb.substring(this.event.start, this.event.end);
-                        TextFile.writeFile(rawFilename, raw, true);
+                        FileUtils.writeFile(rawFilename, raw, true);
                         if (features.length < 5) {
-                            TextFile.writeFileFromNums(clickFeatureFilename, features, true, false, 1);
+                            FileUtils.writeFileFromNums(clickFeatureFilename, features, true, false, 1);
                         }
                         else {
-                            TextFile.writeFileFromNums(slideFeatureFilename, features, true, false, 1);
+                            FileUtils.writeFileFromNums(slideFeatureFilename, features, true, false, 1);
                         }
                         return null;
                     }

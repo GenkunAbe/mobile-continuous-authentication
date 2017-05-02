@@ -1,9 +1,7 @@
 package org.genku.touchauth.Util;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * Created by genku on 4/17/2017.
@@ -48,7 +46,7 @@ public class DataUtils {
         double[][] values;
 
         if (isRestore) {
-            values = TextFile.readFileToMatrix(coefsFilename);
+            values = FileUtils.readFileToMatrix(coefsFilename);
             if (values[0].length != m) {
                 return null;
             }
@@ -67,8 +65,8 @@ public class DataUtils {
                     }
                 }
             }
-            TextFile.writeFileFromNums(coefsFilename, values[0], false, false, 0);
-            TextFile.writeFileFromNums(coefsFilename, values[1], true, false, 0);
+            FileUtils.writeFileFromNums(coefsFilename, values[0], false, false, 0);
+            FileUtils.writeFileFromNums(coefsFilename, values[1], true, false, 0);
         }
 
         double[][] ans = new double[n][m];

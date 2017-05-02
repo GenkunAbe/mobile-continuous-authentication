@@ -12,9 +12,11 @@ import org.genku.touchauth.Model.TouchFeatureExtraction;
 import org.genku.touchauth.Model.SVM;
 import org.genku.touchauth.R;
 import org.genku.touchauth.Util.DataUtils;
-import org.genku.touchauth.Util.TextFile;
+import org.genku.touchauth.Util.FileUtils;
 
 public class TouchPredictService extends Service {
+
+    public static double confidence;
 
     // Get External Storage Directory & the filename of raw data and features
     final String dir = Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -76,20 +78,20 @@ public class TouchPredictService extends Service {
                 double[] feature = TouchFeatureExtraction.extract(event);
                 if (feature.length < 5) {
                     clickFeatures[clickNum] = feature;
-                    TextFile.writeFileFromNums(clickFeatureFilename, clickFeatures[clickNum++], true, false, 1);
+                    FileUtils.writeFileFromNums(clickFeatureFilename, clickFeatures[clickNum++], true, false, 1);
                     if (clickNum >= 9) {
                         boolean ans = getPredictResult(DataUtils.cleanData(clickFeatures, true), true);
-                        TextFile.writeFile(clickResultFilename, ans + "\n", true);
+                        FileUtils.writeFile(clickResultFilename, ans + "\n", true);
                         clickFeatures = new double[10][2];
                         clickNum = 0;
                     }
                 }
                 else {
                     slideFeatures[slideNum] = feature;
-                    TextFile.writeFileFromNums(slideFeatureFilename, slideFeatures[slideNum++], true, false, 1);
+                    FileUtils.writeFileFromNums(slideFeatureFilename, slideFeatures[slideNum++], true, false, 1);
                     if (slideNum >= 9) {
                         boolean ans = getPredictResult(DataUtils.cleanData(slideFeatures, true), false);
-                        TextFile.writeFile(slideResultFilename, ans + "\n", true);
+                        FileUtils.writeFile(slideResultFilename, ans + "\n", true);
                         slideFeatures = new double[10][16];
                         slideNum = 0;
                     }
@@ -110,6 +112,7 @@ public class TouchPredictService extends Service {
             double ans = model.predict(vector);
             positiveSum += ans;
         }
+        confidence = positiveSum / 10.0;
         return positiveSum > 2;
     }
 

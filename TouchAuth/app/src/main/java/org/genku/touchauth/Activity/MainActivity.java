@@ -21,7 +21,7 @@ import org.genku.touchauth.Service.SensorDataCollectingService;
 import org.genku.touchauth.Service.TouchDataCollectingService;
 import org.genku.touchauth.Service.TouchPredictService;
 import org.genku.touchauth.Util.DataUtils;
-import org.genku.touchauth.Util.TextFile;
+import org.genku.touchauth.Util.FileUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,9 +34,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         String dir = Environment.getExternalStorageDirectory().getAbsolutePath();
-        TextFile.makeRootDirectory(dir + "/Auth/");
-        TextFile.makeRootDirectory(dir + "/Auth/Touch/");
-        TextFile.makeRootDirectory(dir + "/Auth/Sensor/");
+        FileUtils.makeRootDirectory(dir + "/Auth/");
+        FileUtils.makeRootDirectory(dir + "/Auth/Touch/");
+        FileUtils.makeRootDirectory(dir + "/Auth/Sensor/");
 
 
         isGrantExternalRW(this);
@@ -81,8 +81,8 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, "Training Start...", Toast.LENGTH_SHORT).show();
 
         String dir  = Environment.getExternalStorageDirectory().getAbsolutePath();
-        double[][] clickFeatures = TextFile.readFileToMatrix(dir + "/click_features.txt");
-        double[][] slideFeatures = TextFile.readFileToMatrix(dir + "/slide_features.txt");
+        double[][] clickFeatures = FileUtils.readFileToMatrix(dir + "/click_features.txt");
+        double[][] slideFeatures = FileUtils.readFileToMatrix(dir + "/slide_features.txt");
 
         double[] clickLabel = new double[clickFeatures.length];
         for (int i = 0; i < clickLabel.length; ++i) {

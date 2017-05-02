@@ -9,6 +9,7 @@ import android.hardware.SensorManager;
 import android.os.Environment;
 import android.os.IBinder;
 
+import org.genku.touchauth.Model.NGramModel;
 import org.genku.touchauth.Model.SensorFeatureExtraction;
 import org.genku.touchauth.Util.DataUtils;
 import org.genku.touchauth.Util.FileUtils;
@@ -16,20 +17,31 @@ import org.genku.touchauth.Util.FileUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SensorDataCollectingService extends Service implements SensorEventListener {
-    public SensorDataCollectingService() {
+public class SensorPredictingService extends Service implements SensorEventListener {
+
+    public SensorPredictingService() {
 
     }
 
-    public static double INTERVAL = 10;
+    public static double confidence;
+    public static NGramModel model;
+
+    public static double INTERVAL = 4;
     public static double WINDOW_INTERVAL = 2;
 
+    public static int NUM_OF_CENTROIDS = 120;
+    public static int NUM_OF_N = 2;
+
     public final String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Auth/Sensor/";
-    public final String accDir = dir + "Acc/";
-    public final String oriDir = dir + "Ori/";
-    public final String magDir = dir + "Mag/";
-    public final String gyrDir = dir + "Gyr/";
-    public final String featureVectorsFilename = dir + "FeatureVectors.txt";
+    public final String modelFilename = dir + "model.txt";
+    public final String centroidsFilename = dir + "centroids.txt";
+    public final String trainFvFilename = dir + "FeatureVectors.txt";
+
+    public final String accDir = dir + "Test/Acc/";
+    public final String oriDir = dir + "Test/Ori/";
+    public final String magDir = dir + "Test/Mag/";
+    public final String gyrDir = dir + "Test/Gyr/";
+    public final String featureVectorsFilename = dir + "Test/FeatureVectors.txt";
 
     private SensorManager sensorManager;
     private double[] gravity = {0, 0, 9.8};
@@ -45,7 +57,7 @@ public class SensorDataCollectingService extends Service implements SensorEventL
     private List<List<Double>> gyrTempData = new ArrayList<>();
 
     private int groupCount = 0;
-    private static int MAX_GROUP_COUNT = 4;
+    private static int MAX_GROUP_COUNT = 1;
 
 
 
@@ -56,6 +68,21 @@ public class SensorDataCollectingService extends Service implements SensorEventL
         FileUtils.makeRootDirectory(oriDir);
         FileUtils.makeRootDirectory(magDir);
         FileUtils.makeRootDirectory(gyrDir);
+
+        if (model == null) {
+            try {
+                double[][] nums = FileUtils.readFileToMatrix(modelFilename);
+                double[][] centroids = FileUtils.readFileToMatrix(centroidsFilename);
+                model = new NGramModel(nums, centroids, NUM_OF_N);
+            } catch (Exception e) {
+                double[][] fv = FileUtils.readFileToMatrix(trainFvFilename);
+                model = new NGramModel(NUM_OF_CENTROIDS, NUM_OF_N);
+                model.train(fv);
+
+                model.saveModel(modelFilename);
+                model.saveCentroids(centroidsFilename);
+            }
+        }
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
@@ -117,6 +144,8 @@ public class SensorDataCollectingService extends Service implements SensorEventL
                                         }
                                     }
                                 }).start();
+
+                                confidence = model.predict(featureVectors);
 
                                 accTempData = new ArrayList<>();
                                 oriTempData = new ArrayList<>();
