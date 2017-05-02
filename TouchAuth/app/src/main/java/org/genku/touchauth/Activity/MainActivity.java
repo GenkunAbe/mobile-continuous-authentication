@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
         model.saveModel(modelFilename);
         model.saveCentroids(centroidsFilename);
-        
+
 
         Toast.makeText(this, "Training End!", Toast.LENGTH_SHORT).show();
     }
