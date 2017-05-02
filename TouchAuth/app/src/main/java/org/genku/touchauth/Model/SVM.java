@@ -1,5 +1,7 @@
 package org.genku.touchauth.Model;
 
+import android.support.annotation.Nullable;
+
 import libsvm.svm;
 import libsvm.svm_model;
 import libsvm.svm_node;
@@ -45,6 +47,10 @@ public class SVM {
         // param.C = 1;
     }
 
+    public SVM(svm_model model_) {
+        model = model_;
+    }
+
     public void train(double[][] vectors, double[] labels) {
 
         param.gamma = 1.0 / vectors[0].length;
@@ -88,5 +94,22 @@ public class SVM {
 
     public svm_model getModel() {
         return model;
+    }
+
+    public static void save(SVM model_, String filename_) {
+        try {
+            svm.svm_save_model(filename_, model_.getModel());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Nullable
+    public static SVM load(String filename_) {
+        try {
+            return new SVM(svm.svm_load_model(filename_));
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
