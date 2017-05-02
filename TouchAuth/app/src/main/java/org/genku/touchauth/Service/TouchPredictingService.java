@@ -14,12 +14,12 @@ import org.genku.touchauth.R;
 import org.genku.touchauth.Util.DataUtils;
 import org.genku.touchauth.Util.FileUtils;
 
-public class TouchPredictService extends Service {
+public class TouchPredictingService extends Service {
 
     public static double confidence;
 
     // Get External Storage Directory & the filename of raw data and features
-    final String dir = Environment.getExternalStorageDirectory().getAbsolutePath();
+    final String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Auth/Touch";
     final String clickFeatureFilename = dir + "/click_test_features.txt";
     final String slideFeatureFilename = dir + "/slide_test_features.txt";
     final String clickResultFilename = dir + "/click_result_features.txt";
@@ -29,7 +29,7 @@ public class TouchPredictService extends Service {
     final String slideCoefsFilename = dir + "/slide_coefs.txt";
 
 
-    public TouchPredictService() {
+    public TouchPredictingService() {
     }
 
     @Override

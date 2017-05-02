@@ -25,11 +25,15 @@
             android:enabled="true"
             android:exported="true" />
         <service
-            android:name=".Service.TouchPredictService"
+            android:name=".Service.TouchPredictingService"
             android:enabled="true"
             android:exported="true" />
         <service
             android:name=".Service.SensorDataCollectingService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".Service.AuthService"
             android:enabled="true"
             android:exported="true"></service>
     </application>

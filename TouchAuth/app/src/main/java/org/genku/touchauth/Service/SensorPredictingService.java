@@ -33,8 +33,8 @@ public class SensorPredictingService extends Service implements SensorEventListe
     public static int NUM_OF_N = 2;
 
     public final String dir = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Auth/Sensor/";
-    public final String modelFilename = dir + "model.txt";
-    public final String centroidsFilename = dir + "centroids.txt";
+    public final String modelFilename = dir + "Model.txt";
+    public final String centroidsFilename = dir + "Centroids.txt";
     public final String trainFvFilename = dir + "FeatureVectors.txt";
 
     public final String accDir = dir + "Test/Acc/";

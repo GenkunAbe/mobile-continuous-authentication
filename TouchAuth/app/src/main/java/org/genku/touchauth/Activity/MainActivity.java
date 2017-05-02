@@ -15,11 +15,14 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
+import org.genku.touchauth.Model.NGramModel;
 import org.genku.touchauth.Model.SVM;
 import org.genku.touchauth.R;
+import org.genku.touchauth.Service.AuthService;
 import org.genku.touchauth.Service.SensorDataCollectingService;
+import org.genku.touchauth.Service.SensorPredictingService;
 import org.genku.touchauth.Service.TouchDataCollectingService;
-import org.genku.touchauth.Service.TouchPredictService;
+import org.genku.touchauth.Service.TouchPredictingService;
 import org.genku.touchauth.Util.DataUtils;
 import org.genku.touchauth.Util.FileUtils;
 
@@ -60,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     public void onCollectStartButtonClick(View view) {
 
         try {
-            stopService(new Intent(this, TouchPredictService.class));
+            stopService(new Intent(this, TouchPredictingService.class));
             stopService(new Intent(this, SensorDataCollectingService.class));
         } catch (Exception e) {
             e.printStackTrace();
@@ -80,9 +83,9 @@ public class MainActivity extends AppCompatActivity {
 
         Toast.makeText(this, "Training Start...", Toast.LENGTH_SHORT).show();
 
-        String dir  = Environment.getExternalStorageDirectory().getAbsolutePath();
-        double[][] clickFeatures = FileUtils.readFileToMatrix(dir + "/click_features.txt");
-        double[][] slideFeatures = FileUtils.readFileToMatrix(dir + "/slide_features.txt");
+        String dir  = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Auth/";
+        double[][] clickFeatures = FileUtils.readFileToMatrix(dir + "Touch/click_features.txt");
+        double[][] slideFeatures = FileUtils.readFileToMatrix(dir + "Touch/slide_features.txt");
 
         double[] clickLabel = new double[clickFeatures.length];
         for (int i = 0; i < clickLabel.length; ++i) {
@@ -95,10 +98,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         clickFeatures = DataUtils.cleanData(clickFeatures, true);
-        clickFeatures = DataUtils.scaleData(clickFeatures, dir + "/click_coefs.txt", false);
+        clickFeatures = DataUtils.scaleData(clickFeatures, dir + "Touch/click_coefs.txt", false);
 
         slideFeatures = DataUtils.cleanData(slideFeatures, true);
-        slideFeatures = DataUtils.scaleData(slideFeatures, dir + "/slide_coefs.txt", false);
+        slideFeatures = DataUtils.scaleData(slideFeatures, dir + "Touch/slide_coefs.txt", false);
 
 
         clickModel = new SVM();
@@ -106,20 +109,28 @@ public class MainActivity extends AppCompatActivity {
 
         slideModel = new SVM();
         slideModel.train(slideFeatures, slideLabel);
+
+
+
+        String trainFvFilename = dir + "Sensor/FeatureVectors.txt";
+        String modelFilename = dir + "Sensor/Model.txt";
+        String centroidsFilename = dir + "Sensor/Centroids.txt";
+        double[][] fv = FileUtils.readFileToMatrix(trainFvFilename);
+        NGramModel model = new NGramModel(120, 2);
+        model.train(fv);
+
+        model.saveModel(modelFilename);
+        model.saveCentroids(centroidsFilename);
+        
+
         Toast.makeText(this, "Training End!", Toast.LENGTH_SHORT).show();
     }
 
     public void onTestStartButtonClick(View view) {
 
-        try {
-            stopService(new Intent(this, TouchDataCollectingService.class));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         Toast.makeText(this, " Start...", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent();
-        intent.setClass(this, TouchPredictService.class);
+        intent.setClass(this, AuthService.class);
         startService(intent);
     }
 
@@ -139,7 +150,10 @@ public class MainActivity extends AppCompatActivity {
 
         try {
             stopService(new Intent(this, TouchDataCollectingService.class));
-            stopService(new Intent(this, TouchPredictService.class));
+            stopService(new Intent(this, SensorDataCollectingService.class));
+            stopService(new Intent(this, TouchPredictingService.class));
+            stopService(new Intent(this, SensorPredictingService.class));
+            stopService(new Intent(this, AuthService.class));
         } catch (Exception e) {
             e.printStackTrace();
         }
